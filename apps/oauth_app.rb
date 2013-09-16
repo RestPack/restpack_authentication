@@ -10,13 +10,13 @@ class OAuthApp < Sinatra::Base
   use RestPackSession
 
   get '/' do
-    "Welcome to the authentication service for #{env['restpack.domain'][:identifier]}"
+    "Welcome to the authentication service for #{env[:restpack][:domain][:identifier]}"
   end
 
   %w(get post).each do |method|
     send(method, "/auth/:provider/callback") do
       response = RestPack::User::Service::Commands::User::OmniAuthenticate.run({
-        application_id: env['restpack.domain'][:application_id],
+        application_id: env[:restpack][:application_id],
         omniauth_response: env['omniauth.auth']
       })
 
@@ -38,7 +38,7 @@ class OAuthApp < Sinatra::Base
   OmniAuthSetup = lambda do |env|
     strategy = env['omniauth.strategy'].name.to_sym
 
-    domain = env['restpack.domain']
+    domain = env[:restpack][:domain]
     oauth_configuration = domain[:oauth_providers]
 
     if oauth_configuration.nil? or oauth_configuration.empty?

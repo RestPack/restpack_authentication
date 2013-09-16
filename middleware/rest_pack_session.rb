@@ -14,8 +14,14 @@ class RestPackSession
 
     if response.status == :ok
       domain = response.result[:domains][0]
-      env['restpack.domain'] = domain
-      env['restpack.application'] = response.result[:applications][0]
+      application = response.result[:applications][0]
+      env[:restpack] = {
+        domain: domain,
+        domain_id: domain[:id],
+        application: application,
+        application_id: application[:id]
+      }
+
       env['rack.session.options'][:secret] = domain[:session_secret]
     else
       raise "[#{identifier}] is not a RestPack domain"
