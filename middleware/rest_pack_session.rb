@@ -5,7 +5,6 @@ class RestPackSession
 
   def call(env)
     identifier = env['HTTP_HOST'].split(':')[0]
-    identifier.slice!('auth.')
 
     response = RestPack::Core::Service::Commands::Domain::ByIdentifier.run({
       identifier: identifier,
