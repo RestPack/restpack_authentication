@@ -4,8 +4,9 @@ class RestPackSession
   end
 
   def call(env)
+    identifier = Rack::Request.new(env)
     response = RestPack::Core::Service::Commands::Domain::ByIdentifier.run({
-      identifier: Rack::Request.new(env).host,
+      identifier: identifier.host,
       includes: 'applications'
     })
 
