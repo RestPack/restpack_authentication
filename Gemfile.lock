@@ -1,4 +1,9 @@
 PATH
+  remote: ../encrypted_cookie
+  specs:
+    encrypted_cookie (0.0.4)
+
+PATH
   remote: ../restpack_core_service
   specs:
     restpack_core_service (0.0.11)
@@ -19,6 +24,12 @@ PATH
       restpack_serializer
       restpack_service
       sinatra (~> 1.4.3)
+
+PATH
+  remote: ../restpack_web
+  specs:
+    restpack_web (0.0.4)
+      restpack_gem
 
 GEM
   remote: https://rubygems.org/
@@ -121,11 +132,13 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  encrypted_cookie!
   omniauth
   omniauth-google-oauth2
   omniauth-twitter
   rack-auto-session-domain
   restpack_core_service!
   restpack_user_service!
+  restpack_web!
   sinatra
   unicorn (~> 4.6.2)
