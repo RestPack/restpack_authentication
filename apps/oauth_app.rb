@@ -2,6 +2,7 @@ require 'sinatra'
 require 'omniauth'
 require 'omniauth-twitter'
 require 'omniauth-google-oauth2'
+require 'omniauth-github'
 
 require 'restpack_web'
 
@@ -24,7 +25,7 @@ class OAuthApp < Sinatra::Base
       if response.success?
         user = response.result[:users].first
         restpack_session[:user_id] = user[:id]
-        redirect params[:next] || '/'
+        redirect request.env['omniauth.origin'] || '/'
       else
         #TODO: GJ: handle exceptions
         "ERROR"
@@ -65,9 +66,10 @@ class OAuthApp < Sinatra::Base
     env['omniauth.strategy'].options[:consumer_key] = strategy_config['key']
     env['omniauth.strategy'].options[:consumer_secret] = strategy_config['secret']
 
+    env['omniauth.strategy'].options[:client_id] = strategy_config['key']
+    env['omniauth.strategy'].options[:client_secret] = strategy_config['secret']
+
     if strategy == :google_oauth2
-      env['omniauth.strategy'].options[:client_id] = strategy_config['key']
-      env['omniauth.strategy'].options[:client_secret] = strategy_config[secret]
       env['omniauth.strategy'].options[:authorize_params] = {access_type: 'online', approval_prompt: ''}
     end
   end
@@ -75,5 +77,6 @@ class OAuthApp < Sinatra::Base
   use OmniAuth::Builder do
     provider :twitter, :setup => OmniAuthSetup
     provider :google_oauth2, :setup => OmniAuthSetup
+    provider :github, :setup => OmniAuthSetup
   end
 end

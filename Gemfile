@@ -9,6 +9,7 @@ gem 'encrypted_cookie', path: '../encrypted_cookie'
 gem 'omniauth'
 gem 'omniauth-twitter'
 gem 'omniauth-google-oauth2'
+gem 'omniauth-github'
 
 gem 'restpack_core_service', path: '../restpack_core_service'
 gem 'restpack_user_service', path: '../restpack_user_service'
