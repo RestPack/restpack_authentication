@@ -18,18 +18,16 @@ class OAuthApp < Sinatra::Base
   %w(get post).each do |method|
     send(method, "/auth/:provider/callback") do
       response = RestPack::User::Service::Commands::User::OmniAuthenticate.run({
-        application_id: restpack[:application][:id],
+        application_id: restpack[:application_id],
         omniauth_response: env['omniauth.auth']
       })
+      raise unless response.success?
 
-      if response.success?
-        user = response.result[:users].first
-        restpack_session[:user_id] = user[:id]
-        redirect request.env['omniauth.origin'] || '/'
-      else
-        #TODO: GJ: handle exceptions
-        "ERROR"
-      end
+      user = response.result[:users].first
+      restpack_session[:user_id] = user[:id]
+      restpack_session[:account_id] = get_account_id(user)
+
+      redirect request.env['omniauth.origin'] || '/'
     end
    end
 
@@ -39,6 +37,43 @@ class OAuthApp < Sinatra::Base
   end
 
   private
+
+  def get_account_id(user)
+    #NOTE: GJ: this needs a big refactor once we've come up with a nice dsl for the services
+    response = RestPack::Group::Service::Commands::Membership::List.run({
+      application_id: restpack[:application_id],
+      is_account_group: true
+    })
+    raise unless response.success?
+
+    if response.result[:memberships].any?
+      #TODO: GJ: return the default membership.account_id
+      return response.result[:memberships][0][:account_id]
+    else #create an account and group for this user
+      response = RestPack::Account::Service::Commands::Account::Create.run({
+        accounts: [{
+          created_by: user[:id],
+          name: user[:name]
+        }]
+      })
+      raise unless response.success?
+
+      account_id = response.result[:accounts][0][:id]
+
+      response = RestPack::Group::Service::Commands::Group::Create.run({
+        groups: [{
+          application_id: user[:application_id],
+          created_by: user[:id],
+          name: user[:name],
+          account_id: account_id,
+          invitation_required: true #TODO: GJ: perhaps this should default to true? or maybe renamed to public?
+        }]
+      })
+      raise unless response.success?
+
+      return account_id
+    end
+  end
 
   def restpack
     env['restpack']
