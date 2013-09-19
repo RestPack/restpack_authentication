@@ -42,6 +42,7 @@ class OAuthApp < Sinatra::Base
     #NOTE: GJ: this needs a big refactor once we've come up with a nice dsl for the services
     response = RestPack::Group::Service::Commands::Membership::List.run({
       application_id: restpack[:application_id],
+      user_id: user[:id],
       is_account_group: true
     })
     raise unless response.success?
