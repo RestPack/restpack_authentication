@@ -53,6 +53,7 @@ class OAuthApp < Sinatra::Base
     else #create an account and group for this user
       response = RestPack::Account::Service::Commands::Account::Create.run({
         accounts: [{
+          application_id: restpack[:application_id],
           created_by: user[:id],
           name: user[:name]
         }]
