@@ -27,7 +27,7 @@ class OAuthApp < Sinatra::Base
       restpack_session[:user_id] = user[:id]
       restpack_session[:account_id] = get_account_id(user)
 
-      redirect request.env['omniauth.origin'] || '/'
+      redirect params[:next] || request.env['omniauth.origin'] || '/'
     end
    end
 
@@ -89,15 +89,14 @@ class OAuthApp < Sinatra::Base
     strategy = env['omniauth.strategy'].name.to_sym
 
     domain = env['restpack'][:domain]
-    oauth_configuration = domain[:oauth_providers]
+    oauth_providers = domain[:oauth_providers]
 
-    if oauth_configuration.nil? or oauth_configuration.empty?
+    if oauth_providers.nil? or oauth_providers.empty?
       raise "[#{domain[:identifier]}] has no OAUTH configuration"
     end
-
-    strategy_config = oauth_configuration[strategy.to_s]
-    if strategy_config.nil? or oauth_configuration.empty?
-      raise "[#{domain[:identifier]}] has no OAUTH [#{strategy}] configuration"
+    strategy_config = oauth_providers.find { |provider| provider['identifier'] == strategy.to_s }
+    if strategy_config.nil?
+      raise "[#{domain[:identifier]}] has no OAUTH [#{strategy}] provider"
     end
 
     env['omniauth.strategy'].options[:consumer_key] = strategy_config['key']
