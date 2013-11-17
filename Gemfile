@@ -17,3 +17,5 @@ gem 'restpack_user_service', path: '../restpack_user_service'
 gem 'restpack_group_service', path: '../restpack_group_service'
 gem 'restpack_account_service', path: '../restpack_account_service'
 gem 'restpack_web', path: '../restpack_web'
+
+gem 'restpack_service_messaging', path: '../restpack_service_messaging'

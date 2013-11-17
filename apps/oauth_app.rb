@@ -17,7 +17,7 @@ class OAuthApp < Sinatra::Base
 
   %w(get post).each do |method|
     send(method, "/auth/:provider/callback") do
-      response = RestPack::User::Service::Commands::User::OmniAuthenticate.run({
+      response = Commands::Users::User::OmniAuthenticate.run({
         application_id: restpack[:application_id],
         omniauth_response: env['omniauth.auth']
       })
@@ -39,8 +39,7 @@ class OAuthApp < Sinatra::Base
   private
 
   def get_account_id(user)
-    #NOTE: GJ: this needs a big refactor once we've come up with a nice dsl for the services
-    response = RestPack::Group::Service::Commands::Membership::List.run({
+    response = Commands::Groups::Membership::List.run({
       application_id: restpack[:application_id],
       user_id: user[:id],
       is_account_group: true
@@ -51,7 +50,7 @@ class OAuthApp < Sinatra::Base
       #TODO: GJ: return the default membership.account_id
       return response.result[:memberships][0][:account_id]
     else #create an account and group for this user
-      response = RestPack::Account::Service::Commands::Account::Create.run({
+      response = Commands::Accounts::Account::Create.run({
         accounts: [{
           application_id: restpack[:application_id],
           created_by: user[:id],
@@ -62,7 +61,7 @@ class OAuthApp < Sinatra::Base
 
       account_id = response.result[:accounts][0][:id]
 
-      response = RestPack::Group::Service::Commands::Group::Create.run({
+      response = Commands::Groups::Group::Create.run({
         groups: [{
           application_id: user[:application_id],
           created_by: user[:id],
