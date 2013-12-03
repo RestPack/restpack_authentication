@@ -9,7 +9,7 @@ class GroupsApp < Sinatra::Base
     if @restpack.authenticated?
       p "Accept group invitation"
 
-      response = Commands::Invitation::Rsvp.run({
+      response = Commands::Groups::Invitation::Rsvp.run({
         application_id: @restpack.application_id,
         user_id: @restpack.user_id,
         access_key: params[:access_key],
