@@ -36,6 +36,10 @@ class OAuthApp < Sinatra::Base
     redirect params[:next] || '/'
   end
 
+  get '/auth/status' do
+    'ok'
+  end
+
   private
 
   def get_account_id(user)
